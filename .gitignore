@@ -1,3 +1,5 @@
 dech.egg-info
 notes.md
 test.py
+*pyc
+__pycache__
