@@ -1,0 +1,7 @@
+.row {
+    display: flex;
+}
+
+.figure {
+    margin: .1em;
+}
