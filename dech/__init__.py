@@ -40,11 +40,11 @@ class Grid(Element):
                 elif hasattr(row, 'html'):
                     row_strs.append(row.html(context))
                 else:
-                    raise ValueError(f"Unsupported object {type(row)}")
+                    raise TypeError(f"Unsupported object {type(row)}")
         elif hasattr(self.content, 'html'):
             row_strs = [self.content.html(context)]
         else:
-            raise ValueError(f"Unsupported object {type(self.content)}")
+            raise TypeError(f"Unsupported object {type(self.content)}")
 
         result = ''
         for row_str in row_strs:
