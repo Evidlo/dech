@@ -3,21 +3,29 @@ import textwrap
 from importlib import resources
 
 from .img import Img
+from .html import HTML
+from .paragraph import Paragraph
 from .element import Element
+from .code import Code
+
+__all__ = ['Img', 'HTML', 'Paragraph', 'Code', 'Page', 'Grid', 'Figure']
+
+img_sync_js = open(resources.files('dech') / 'img_sync.js').read()
 
 class Figure(Element):
     """Generate <figure> and <figcaption>"""
 
-    def __init__(self, caption, element, pos='bottom'):
+    def __init__(self, caption, element, class_="", pos='bottom'):
         self.caption = caption
         self.element = element
         self.pos = pos
+        self.class_ = class_
 
     def html(self, context={}):
         el_html = self.element.html(context)
         cap_html = self.caption
         if self.pos == 'bottom':
-            return f'<figure class="figure"><figcaption>{cap_html}</figcaption>{el_html}</figure>'
+            return f'<figure class="{self.class_}"><figcaption>{cap_html}</figcaption>{el_html}</figure>'
 
 
 class Grid(Element):
@@ -56,24 +64,28 @@ class Grid(Element):
 class Page(Grid):
     """Header + footer wrapper to make complete HTML page"""
 
-    def __init__(self, content, header=None, footer=None):
+    def __init__(self, content, header=None, footer=None, css=None, head_extra=""):
         """Intialize page with content
 
         Args:
             content (Element): dech element with .html() function
             header (str or None): replace default header HTML
             footer (str or None): replace default footer HTML
+            css (str or None): extra css styling to insert into <head>
+            head_extra (str or None): extra HTML to insert into <head> such as JS
         """
         self.content = content
 
         if header is None:
-            css = open(resources.files('dech') / 'styles.css').read()
+            default_css = open(resources.files('dech') / 'styles.css').read()
             self.header = textwrap.dedent(f"""\
             <!doctype html>
             <html>
             <head>
                 <style>
+                {default_css}
                 {css}
+                {head_extra}
                 </style>
             </head>
             <body>

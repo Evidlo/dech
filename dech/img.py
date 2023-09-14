@@ -12,24 +12,30 @@ class Img(Element):
     """Generate <img> tag for PNGs or GIFs"""
 
     @handle_torch()
-    def __init__(self, content, title=None, width=None, height=None, animation=False,
-                 duration=100):
+    def __init__(self, content, class_="", title=None, width=None, height=None, animation=False,
+                 duration=3, rescale=True, vmin=0, vmax=None):
         """Initialize Img element
 
         Args:
             content (str, matplotlib figure, or ndarray): image content
+            class_ (str): custom class to apply
             title (str): image title field
             width (int or str): image width (default units are pixels)
             height (int or str): image height (default units are pixels)
             animation (bool): whether content is an animation
-            duration (int): delay in ms between frames
+            duration (float): Total animation time in seconds.  Default is 3
+            vmin (float): minimum data value for scaling dynamic range.  default 0
+            vmax (float): minimum data value for scaling dynamic range.  default `content` max
         """
         self.content = content
+        self.class_ = class_
         self.title = title
         self.width = width
         self.height = height
         self.animation = animation
         self.duration = duration
+        self.vmin = vmin
+        self.vmax = vmax
 
     def html(self, context={}):
 
@@ -62,7 +68,9 @@ class Img(Element):
         elif type(self.content).__name__ == 'ndarray':
             buff = BytesIO()
             styles.append("image-rendering:crisp-edges")
-            rescaled = (self.content * 255 / self.content.max()).astype('uint8')
+            # rescale image stack to 0-255
+            vmax = self.vmax if self.vmax is not None else self.content.max()
+            rescaled = (255 * (self.content - self.vmin) / (vmax - self.vmin)).astype('uint8')
             if self.animation:
                 buff = gif(rescaled, duration=self.duration)
                 src = 'data:image/gif;base64,{}'.format(
@@ -78,18 +86,18 @@ class Img(Element):
             raise TypeError(f"Unsupported object {type(self.content)}")
 
         style = ";".join(styles)
-        return f'<img style="{style}" src="{src}"/>'
+        return f'<img class="{self.class_}" style="{style}" src="{src}"/>'
 
 
 
-def gif(x, duration=100):
+def gif(x, duration=3):
     """Save image sequence as gif
 
     Args:
         savefile (str): path to save location
         x (torch.Tensor or numpy.ndarray): input data of shape (num_images, width, height)
             or (num_images, width, height, 3) for RGB images
-        duration (int): delay in ms between frames
+        duration (float): Total animation time in seconds.  Default is 3
     """
 
     from PIL import Image
@@ -102,7 +110,6 @@ def gif(x, duration=100):
     else:
         raise ValueError('Invalid size for x')
 
-    # duration is the number of milliseconds between frames
     buff = BytesIO()
-    imgs[0].save(buff, format='gif', save_all=True, append_images=imgs[1:], duration=duration, loop=0)
+    imgs[0].save(buff, format='gif', save_all=True, append_images=imgs[1:], duration=duration * 1000 // x.shape[0], loop=0)
     return buff

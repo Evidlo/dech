@@ -6,7 +6,7 @@ class Element:
     def save(self, outfile):
         raise NotImplementedError
 
-    def html(self, context={}):
+    def html(self, class_="", context={}):
         """Generate HTML for this element
 
         Args:
