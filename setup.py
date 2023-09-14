@@ -24,6 +24,8 @@ setup(
     # your project's pip dependencies
     install_requires=[
         # consider specifying version as well
+        "imageio",
+        "pillow",
     ],
     include_package_data=True,
     # automatically look for subfolders with __init__.py

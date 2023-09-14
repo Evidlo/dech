@@ -26,6 +26,30 @@ def test_img():
     plt.plot(np.random.random(10))
     Img(plt.figure('test')).html()
 
+def test_html():
+    svg_data = """
+    <svg width="400" height="180">
+    <rect x="50" y="20" rx="20" ry="20" width="150" height="150"
+    style="fill:red;stroke:black;stroke-width:5;opacity:0.5" />
+    </svg>"""
+
+    s = HTML(svg_data)
+
+
+def test_paragraph():
+    text = """
+    some text here
+    foobar
+    """
+    p = Paragraph(text)
+
+
+def test_code():
+    text = """
+    some text here
+    foobar
+    """
+    c = Code(text)
 
 def test_page(tmp_path):
     Page([]).save(tmp_path / "test.html")
