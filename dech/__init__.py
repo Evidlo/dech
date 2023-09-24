@@ -8,7 +8,7 @@ from .paragraph import Paragraph
 from .element import Element
 from .code import Code
 
-__all__ = ['Img', 'HTML', 'Paragraph', 'Code', 'Page', 'Grid', 'Figure']
+__all__ = ['Img', 'HTML', 'Paragraph', 'Code', 'Page', 'Grid', 'Figure', 'img_sync_js']
 
 img_sync_js = open(resources.files('dech') / 'img_sync.js').read()
 
